@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
+  <Asset Type="Graphics:FontDescription">
+    <FontName>80s-retro-future</FontName> <!-- The name of your TTF font file without the extension, assuming it's in the same directory as the .spritefont file -->
+    <Size>48</Size> <!-- Font size -->
+    <Spacing>0</Spacing> <!-- Spacing between characters -->
+    <UseKerning>true</UseKerning>
+    <Style>Regular</Style> <!-- This should match the style in your TTF file; common styles are Regular, Bold, Italic -->
+    <CharacterRegions>
+      <CharacterRegion>
+        <Start>&#32;</Start> <!-- Space character -->
+        <End>&#126;</End> <!-- Tilde character -->
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>&#160;</Start> <!-- Non-breaking space -->
+        <End>&#255;</End> <!-- Extended ASCII characters -->
+      </CharacterRegion>
+    </CharacterRegions>
+  </Asset>
+</XnaContent>
