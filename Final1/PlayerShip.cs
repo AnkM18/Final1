@@ -136,7 +136,7 @@ namespace Final1
         public void Draw(SpriteBatch spriteBatch)
         {
             Vector2 origin = new Vector2(Width / 2, Height / 2);
-            Vector2 drawPosition = new Vector2(Position.X - Width / 2, Position.Y - Height / 2);
+            Vector2 position = new Vector2(Position.X - Width / 2, Position.Y - Height / 2);
             spriteBatch.Draw(currentTexture, Position, null, Color.White, MathHelper.PiOver2, origin, Scale, SpriteEffects.None, 0f);
 
             // Draw the shield if active

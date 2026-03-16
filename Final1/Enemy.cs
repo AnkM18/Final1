@@ -29,7 +29,9 @@ public class Enemy
     // Get the height of the enemy ship
     public int Height { get { return (int)(Texture.Height * Scale); } }
 
-    private float Scale = 2.0f;
+    private float Scale = 1.5f;
+
+    
 
     // The speed at which the enemy moves
     private float enemyMoveSpeed;
@@ -67,8 +69,11 @@ public class Enemy
 
         if (Active)
         {
+           
             // Calculate the center of the enemy for proper scaling and rotation
             Vector2 origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
+
+           
 
             // Draw the texture with scaling
             spriteBatch.Draw(Texture, Position, null, Color.White, 0f, origin, Scale, SpriteEffects.None, 0f);

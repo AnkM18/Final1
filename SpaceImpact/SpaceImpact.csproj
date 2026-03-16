@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>SpaceImpact</RootNamespace>
+    <AssemblyName>SpaceImpact</AssemblyName>
+    <Nullable>enable</Nullable>
+    <UseWPF>false</UseWPF>
+    <UseWindowsForms>false</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework" Version="3.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Final1\Game1.cs" />
+    <Compile Include="Final1\Player.cs" />
+    <Compile Include="Final1\Enemy.cs" />
+    <Compile Include="Final1\Laser.cs" />
+    <Compile Include="Final1\Explosion.cs" />
+    <Compile Include="Final1\Pickup.cs" />
+    <Compile Include="Final1\Animation.cs" />
+    <Compile Include="Final1\ParallaxBackground.cs" />
+    <Compile Include="Final1\FinalBoss.cs" />
+    <Compile Include="Final1\StartScreen.cs" />
+    <Compile Include="Final1\CustomDialog.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Content\**\*" />
+  </ItemGroup>
+
+</Project>

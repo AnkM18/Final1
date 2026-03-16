@@ -17,7 +17,7 @@ namespace Final1
         
         private float exitButtonScale = 5.0f;
        
-        private float restartButtonScale = 5.0f;
+        private float restartButtonScale = 8.0f;
 
         public EndScreens(Game1 game, Texture2D restartButtonTexture, Texture2D exitButtonTexture)
         {
@@ -29,32 +29,17 @@ namespace Final1
         public void LoadContent()
         {
 
-            // Calculate positions to avoid overlap and maintain center alignment
+            // Get screen size
+            int screenWidth = 1920;
+            int screenHeight = 1080;
 
-            // Centralize restart button
-            /* restartButtonPosition = new Vector2(
-                  _game.GraphicsDevice.Viewport.Width / 2 - (_restartButtonTexture.Width * restartButtonScale) / 2,
-                  _game.GraphicsDevice.Viewport.Height / 2 - _restartButtonTexture.Height * restartButtonScale / 2
-              );
-             exitButtonPosition = new Vector2(
-                 _game.GraphicsDevice.Viewport.Width / 2 - (_exitButtonTexture.Width * exitButtonScale) / 2,
-                 _game.GraphicsDevice.Viewport.Height / 2 + (_exitButtonTexture.Height * 0.5f)  // Adjust vertical spacing
-             );*/
+            // Calculate center position
+            int centerX = screenWidth / 2;
+            int centerY = screenHeight / 2;
 
-            float buttonSpacing = 20; // Space between buttons
-
-            // Centralize restart button
-            restartButtonPosition = new Vector2(
-                960 - (_restartButtonTexture.Width * restartButtonScale) / 2, // 1920 / 2 = 960
-                540 - (_restartButtonTexture.Height * restartButtonScale) / 2 - buttonSpacing // 1080 / 2 = 540
-            );
-
-            // Centralize exit button, positioned below the restart button
-            exitButtonPosition = new Vector2(
-                960 - (_exitButtonTexture.Width * exitButtonScale) / 2, // 1920 / 2 = 960
-                540 + (_exitButtonTexture.Height * exitButtonScale) / 2 + buttonSpacing // 1080 / 2 = 540
-            );
-
+            // Set button positions
+            restartButtonPosition = new Vector2(centerX - 100, centerY - 50);
+            exitButtonPosition = new Vector2(centerX + 100, centerY - 50);
 
         }
 
@@ -78,11 +63,8 @@ namespace Final1
             );
 
 
-            // Check if the play button is clicked
-            if (restartButtonRectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                _game.restartGame();
-            }
+            
+            
 
             // Check if the exit button is clicked
             if (exitButtonRectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)

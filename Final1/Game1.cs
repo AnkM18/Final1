@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using static Pickup;
+using Microsoft.Xna.Framework.Media;
 
 
 namespace Final1
@@ -19,7 +20,7 @@ namespace Final1
         private TimeSpan _previousSpawnTime;
         private Random _random;
         private StartScreen startScreen;
-        private EndScreens endScreen;
+       
         private GameState currentState;
         private GameState setState;
         private Texture2D playButtonTexture;
@@ -72,6 +73,7 @@ namespace Final1
         private bool bossSpawned;
         private TimeSpan lastEnemySpawnTime;
         private CustomDialog _controlsDialog;
+        private Song backgroundMusic;
 
 
         public Game1()
@@ -99,6 +101,7 @@ namespace Final1
             _previousSpawnTime = TimeSpan.Zero;
             _enemySpawnTime = TimeSpan.FromSeconds(1.5);
             _random = new Random();
+            _scorePosition = new Vector2(100, 100);
 
             shieldEffectAnimation = new Animation();
             shieldPickupAnimation = new Animation();
@@ -114,13 +117,15 @@ namespace Final1
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            
+
             Texture2D playButtonTexture = Content.Load<Texture2D>("Buttons/PlayButton");
             Texture2D exitButtonTexture = Content.Load<Texture2D>("Buttons/ExitButton");
             Texture2D settingsButtonTexture = Content.Load<Texture2D>("GUI/Settings");
             Texture2D restartButtonTexture = Content.Load<Texture2D>("Buttons/RestartButton");
             startScreen = new StartScreen(this, playButtonTexture, exitButtonTexture, settingsButtonTexture);
-            endScreen = new EndScreens(this, restartButtonTexture, exitButtonTexture);
-            
+
+           
 
             Texture2D dialogBackgroundTexture = Content.Load<Texture2D>("Backgrounds/DialogBackground");
             SpriteFont dialogFont = Content.Load<SpriteFont>("Fonts/retro");
@@ -151,11 +156,13 @@ namespace Final1
             {
                 throw new Exception("One or more textures failed to load.");
             }
-            Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            //Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            _player.Position = new Vector2(50, 540);
+            playerPosition = _player.Position;
             _player.Initialize(textureFullHealth, textureDamaged, textureSlightDamage, textureVeryDamaged, playerPosition);
 
             // Load enemy texture
-            _enemyTexture = Content.Load<Texture2D>("Enemy/Beholder");
+            _enemyTexture = Content.Load<Texture2D>("Enemy/Ship4");
 
             laserTexture = Content.Load<Texture2D>("Enemy/BeholderBullets");
             laserBeams = new List<Laser>();
@@ -172,8 +179,8 @@ namespace Final1
             _numberSpritesheet = Content.Load<Texture2D>("GUI/NumbersSs");
             _healthBarSpritesheet = Content.Load<Texture2D>("GUI/HealthBar");
             _healthBarPosition = new Vector2(GraphicsDevice.Viewport.Width - 250, 10); // Adjust as needed
-            _scorePosition = new Vector2(10, 10);
-            _score = 0;
+            //_scorePosition = new Vector2(10, 10);
+            //_score = 0;
 
             shieldEffectTexture = Content.Load<Texture2D>("Effects/Shield");
             shieldPickupTexture = Content.Load<Texture2D>("Pickups/ShieldPickup");
@@ -190,6 +197,10 @@ namespace Final1
 
             _player.InitializeShield(shieldEffectTexture);
             pickups = new List<Pickup>();
+
+           /* backgroundMusic = Content.Load<Song>("Music/in-the-wreckage");
+            MediaPlayer.Play(backgroundMusic);
+            MediaPlayer.IsRepeating = true;*/
         }
 
         protected override void Update(GameTime gameTime)
@@ -208,7 +219,7 @@ namespace Final1
                     break;
                 case GameState.Playing:
                     // Existing game update logic
-                    
+                    _scorePosition = new Vector2(10, 10);
                     _sky.Update(gameTime);
                     _clouds1.Update(gameTime);
                     _clouds2.Update(gameTime);
@@ -220,7 +231,7 @@ namespace Final1
                   
                     _player.Update(gameTime);
 
-                    if (gameTimer > TimeSpan.FromSeconds(10) && !bossSpawned) //change FromSeconds value to change the time it takes for the boss to spawn
+                    if (gameTimer > TimeSpan.FromSeconds(100) && !bossSpawned) //change FromSeconds value to change the time it takes for the boss to spawn
                     {
                         _enemies.Clear(); // Clear existing enemies
                         
@@ -277,6 +288,7 @@ namespace Final1
 
                     if (_player.Health <= 0)
                     {
+                        ResetGame();
                         currentState = GameState.GameOver;
                     }
                     if (shieldEffectAnimation.Active)
@@ -290,7 +302,9 @@ namespace Final1
                         // Spawn normal enemy every 5 seconds
                         if (finalBoss.Health <= 0)
                         {
-                            finalBoss.Active = false; // Make sure to deactivate the boss
+                            finalBoss.Active = false; //deactivate the boss
+                            _score += 50;
+                            ResetGame();
                             currentState = GameState.Win; // Transition to Win state
                         }
                     }
@@ -303,15 +317,13 @@ namespace Final1
                     break;
                 case GameState.GameOver:
                     UpdateGameOver(gameTime);
-                    currentState = GameState.Restart;
+                    
                     break;
                 case GameState.Win:
                     UpdateWin(gameTime);
-                    currentState = GameState.Restart;
+                    
                     break;
-                case GameState.Restart:
-                    endScreen.Update(gameTime);
-                    break;
+                
             }
 
             base.Update(gameTime);
@@ -452,15 +464,16 @@ namespace Final1
                     Vector2 textSize = font.MeasureString(gameOverText);
                     Vector2 textPosition = new Vector2((GraphicsDevice.Viewport.Width - textSize.X) / 2, GraphicsDevice.Viewport.Height / 5 - 100);
                     _spriteBatch.DrawString(font, gameOverText, textPosition, Color.White);
-
+                    _scorePosition = new Vector2(950, 240);
                     // Draw score
                     string scoreText = "score: " + _score;
                     DrawScoreUsingSpritesheet(_spriteBatch, _score, new Vector2(textPosition.X, textPosition.Y + 100));
 
+                    DrawScoreUsingSpritesheet(_spriteBatch, _score, _scorePosition);
+
                     
-                    // endScreen.Draw(_spriteBatch);
-                    currentState = GameState.Restart;
-                    endScreen.Draw(_spriteBatch);
+                    startScreen.Draw(_spriteBatch);
+                    
 
                     break;
                 case GameState.Win:
@@ -473,15 +486,14 @@ namespace Final1
 
                     // Draw score in a similar way to the game over screen
                     string scoreTextW = "score: " + _score;
-                    Vector2 scorePosition = new Vector2(textPositionW.X, textPositionW.Y + 500);
-                    DrawScoreUsingSpritesheet(_spriteBatch, _score, scorePosition);
-                    //endScreen.Draw(_spriteBatch);
+                    _scorePosition = new Vector2(950, 240);
+                    DrawScoreUsingSpritesheet(_spriteBatch, _score, _scorePosition);
 
-                    currentState = GameState.Restart;
+                    
+                    startScreen.Draw(_spriteBatch);
+
                     break;
-                case GameState.Restart:
-                    endScreen.Draw(_spriteBatch);
-                    break;
+                
             }
 
 
@@ -548,6 +560,9 @@ namespace Final1
                     if (_player.Health <= 0)
                     {
                         _player.Active = false;
+                        ResetGame();
+                        currentState = GameState.GameOver;
+                        
                         
                     }
                 }
@@ -624,6 +639,7 @@ namespace Final1
                     {
                         finalBoss.Health -= 10; // Adjust damage as needed
                         laser.Active = false; // Deactivate the laser after hitting the boss
+                        
                     }
                 }
                 laserBeams.RemoveAll(l => !l.Active);
@@ -692,17 +708,7 @@ namespace Final1
             _previousSpawnTime = TimeSpan.Zero; // Reset enemy spawn timing
                                                
         }
-        public void restartGame()
-        {
-            currentState = GameState.Playing;
-            _score = 0;
-            // Reset or initialize game components as needed
-            _player.Initialize(textureFullHealth, textureDamaged, textureSlightDamage, textureVeryDamaged, playerPosition);
-           
-            _enemies.Clear(); // Clear existing enemies
-            _previousSpawnTime = TimeSpan.Zero; // Reset enemy spawn timing
-
-        }
+        
         public void ShowControls()
         {
             _controlsDialog.Show();
@@ -750,12 +756,12 @@ namespace Final1
         private void UpdateGameOver(GameTime gameTime)
         {
             // use the logic from endScreen to handle button clicks
-            endScreen.Update(gameTime);
+            startScreen.Update(gameTime);
         }
 
         private void UpdateWin(GameTime gameTime)
         {
-            endScreen.Update(gameTime);
+            startScreen.Update(gameTime);
         }
 
         private void DrawScoreUsingSpritesheet(SpriteBatch spriteBatch, int score, Vector2 position)
@@ -794,19 +800,54 @@ namespace Final1
         {
             int margin = 100; // Margin to ensure pickups spawn within visible range
             Vector2 position = new Vector2(GraphicsDevice.Viewport.Width + margin, _random.Next(margin, GraphicsDevice.Viewport.Height - margin));
-            Vector2 velocity = new Vector2(-100, 0); // Move left at a constant speed
+            Vector2 velocity = new Vector2(-300, 0); // Move left at a constant speed
             Pickup.PickupType type = (Pickup.PickupType)_random.Next(0, 2); // 0 for Health, 1 for Shield
             Texture2D texture = type == Pickup.PickupType.Health ? healthPickupTexture : shieldPickupTexture;
 
             Pickup newPickup = new Pickup(texture, position, type, velocity);
             pickups.Add(newPickup);
         }
-        private void DrawWinningScreen(SpriteBatch spriteBatch)
+        private void ResetGame()
         {
-            
 
-            
+            // Player
+            _player = new Player();
+
+            // Enemies
+            _enemies.Clear();
+
+            // Lasers
+            laserBeams.Clear();
+
+            // Explosions 
+            explosions.Clear();
+
+            // Enemy Lasers
+            enemyLasers.Clear();
+
+            // Pickups
+            pickups.Clear();
+
+            // Boss
+
+            finalBoss = null;
+            // Game state
+            bossSpawned = false;
+
+            gameTimer = TimeSpan.Zero;
+           //finalBoss = new FinalBoss(bossTexture, new Vector2(300, 200), bossLaserTexture);
+
+            //_score = 0;
+
+            _previousSpawnTime = TimeSpan.Zero;
+            _previousPickupSpawnTime = TimeSpan.Zero;
+            lastEnemySpawnTime = TimeSpan.Zero;
+            Initialize();
+
+            // Reset other game state like score
+
         }
+
 
 
     }
